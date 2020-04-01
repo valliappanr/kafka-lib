@@ -20,7 +20,6 @@ import java.util.stream.IntStream;
 
 public class MockConsumerImpl implements DefaultKafkaConsumer {
 
-    private Consumer<ConsumerRecord<String, String>> callback;
     private Multimap<String, KafkaMockData> kafkaMockDataMap = HashMultimap.create();
     private Map<KafkaMockDataKey, Integer> offsetMap = new HashMap<>();
     private final AtomicBoolean shutdown;
@@ -76,7 +75,6 @@ public class MockConsumerImpl implements DefaultKafkaConsumer {
             Consumer<ConsumerRecord<String, String>> callback) throws InterruptedException {
         Thread consumerThread = createConsumerThread(topics, groupId, offsetStrategy, callback);
         consumerThread.start();
-        //consumerThread.join();
     }
 
     private List<ConsumerRecord> checkAndExtractMessage(List<String> topics, String groupId) {
