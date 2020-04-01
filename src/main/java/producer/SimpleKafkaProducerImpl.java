@@ -21,9 +21,15 @@ public class SimpleKafkaProducerImpl implements SimpleKafkaProducer {
         this.kafkaProducer = new KafkaProducer<String, String>(config);
     }
 
+    @Override
     public void send(String topic, String key, String value) throws ExecutionException, InterruptedException {
         ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
         Future<RecordMetadata> future = kafkaProducer.send(record);
         future.get();
+    }
+
+    @Override
+    public void close() {
+        kafkaProducer.close();
     }
 }

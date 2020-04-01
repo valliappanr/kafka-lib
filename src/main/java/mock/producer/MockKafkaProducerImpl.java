@@ -13,4 +13,9 @@ public class MockKafkaProducerImpl implements SimpleKafkaProducer {
     public void send(String topic, String key, String value) throws ExecutionException, InterruptedException {
         kafkaMockDataMap.put(topic, new KafkaMockData(key, value));
     }
+
+    @Override
+    public void close() {
+        kafkaMockDataMap.clear();
+    }
 }

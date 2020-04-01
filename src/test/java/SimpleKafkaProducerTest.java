@@ -8,7 +8,7 @@ public class SimpleKafkaProducerTest {
     @Test
     public void testSimpleKafkaProducerTest() throws ExecutionException, InterruptedException {
         SimpleKafkaProducerImpl simpleKafkaProducer = new SimpleKafkaProducerImpl("meenasoft.co.uk:9092");
-        IntStream.range(0,10).forEach(index -> {
+        IntStream.range(0,1).forEach(index -> {
             try {
                 simpleKafkaProducer.send("test-topic", "hello", "hello-world: " + index );
             } catch (ExecutionException e) {

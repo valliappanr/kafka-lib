@@ -5,31 +5,53 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class DefaultKafkaConsumerImpl {
+public class DefaultKafkaConsumerImpl implements DefaultKafkaConsumer {
+    private String brokerList;
     private BasicConsumeLoop<String, String> kConsumer;
-    private Thread consumerThread;
 
-    public DefaultKafkaConsumerImpl(String brokerList, List<String> topics,
-                                    Consumer<ConsumerRecord<String, String>> callback) {
-        kConsumer = new BasicConsumeLoop<>(
-                brokerList, topics,
-                callback);
-        consumerThread = new Thread(kConsumer);
+    public DefaultKafkaConsumerImpl(String brokerList) {
+        this.brokerList = brokerList;
+
     }
 
-    public DefaultKafkaConsumerImpl(String brokerList, List<String> topics, String groupId, String offsetStrategy,
-                                    Consumer<ConsumerRecord<String, String>> callback) {
-        kConsumer = new BasicConsumeLoop<>(
-                brokerList, topics, groupId, offsetStrategy,
-                callback);
-        consumerThread = new Thread(kConsumer);
+    @Override
+    public void createAndStartConsumer(List<String> topics, String groupId, String offsetStrategy,
+                                       Consumer<ConsumerRecord<String, String>> callback) throws InterruptedException {
+        Thread consumerThread = createKConsumerThread(topics, groupId, offsetStrategy, callback);
+        consumerThread.start();
     }
 
-    public void start() throws InterruptedException {
+    @Override
+    public void createAndStartConsumerAndJoinConsumer(List<String> topics, String groupId, String offsetStrategy,
+                                                      Consumer<ConsumerRecord<String, String>> callback) throws InterruptedException {
+        Thread consumerThread = createKConsumerThread(topics, groupId, offsetStrategy, callback);
         consumerThread.start();
         consumerThread.join();
     }
-    public void stop() throws InterruptedException {
-        kConsumer.shutdown();
+
+    private Thread createKConsumerThread(List<String> topics, String groupId, String offsetStrategy, Consumer<ConsumerRecord<String, String>> callback) {
+        kConsumer = new BasicConsumeLoop<>(brokerList, topics, groupId, offsetStrategy,
+                callback);
+        addShutdownHook();
+        return new Thread(kConsumer);
+    }
+
+    @Override
+    public void stop() {
+        try {
+            kConsumer.shutdown();
+        } catch(InterruptedException iex) {
+            iex.printStackTrace();
+        }
+
+    }
+
+    private void addShutdownHook(){
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                stop();
+            }
+        }));
     }
 }
