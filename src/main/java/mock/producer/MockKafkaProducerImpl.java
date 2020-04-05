@@ -18,4 +18,8 @@ public class MockKafkaProducerImpl implements SimpleKafkaProducer {
     public void close() {
         kafkaMockDataMap.clear();
     }
+
+    public KafkaMockData getMessage(String topic) {
+        return kafkaMockDataMap.get(topic);
+    }
 }

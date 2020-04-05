@@ -71,5 +71,6 @@ public class BasicConsumeLoop<K, V> implements Runnable {
     public void shutdown() throws InterruptedException {
         shutdown.set(true);
         shutdownLatch.await();
+        executorService.shutdown();
     }
 }
